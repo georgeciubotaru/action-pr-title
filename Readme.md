@@ -9,13 +9,13 @@ See [action.yml](./action.yml)
 
 ```yaml
 steps:
-- uses: deepakputhraya/action-pr-title@master
+- uses: naveenk1223/action-pr-title@master
   with:
-    regex: '([a-z])+\/([a-z])+' # Regex the title should match.
-    allowed_prefixes: 'feature,stable,fix' # title should start with the given prefix
+    regex: '.+' # Regex the title should match.
+    allowed_prefixes: 'feature,fix,bugfix,patch,enhancement,hotfix' # title should start with the given prefix
     prefix_case_sensitive: false # title prefix are case insensitive
-    min_length: 5 # Min length of the title
-    max_length: 20 # Max length of the title
+    min_length: 10 # Min length of the title
+    max_length: -1 # Max length of the title
 ```
 
 ## License
