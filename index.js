@@ -16,8 +16,7 @@ async function run() {
         const eventName = github.context.eventName;
         core.info(`Event name: ${eventName}`);
         if (validEvent.indexOf(eventName) < 0) {
-            core.setFailed(`Invalid event: ${eventName}`);
-            return;
+            raiseError(`Invalid event: ${eventName}`);
         }
 
         const title = github.context.payload.pull_request.title;
@@ -26,8 +25,7 @@ async function run() {
         const regex = RegExp(core.getInput('regex'));
         core.info(`Regex: ${regex}`);
         if (!regex.test(title)) {
-            core.setFailed(`Pull Request title "${title}" failed to pass match regex - ${regex}`);
-            return
+            raiseError(`Pull Request title "${title}" failed to pass match regex - ${regex}`);
         }
 
         // Check min length
@@ -40,8 +38,7 @@ async function run() {
         // Check max length
         const maxLen = parseInt(core.getInput('max_length'));
         if (maxLen > 0 && title.length > maxLen) {
-            core.setFailed(`Pull Request title "${title}" is greater than max length specified - ${maxLen}`);
-            return
+            raiseError(`Pull Request title "${title}" is greater than max length specified - ${maxLen}`);
         }
 
         // Check if title starts with a prefix
@@ -49,13 +46,18 @@ async function run() {
         const prefixCaseSensitive = (core.getInput('prefix_case_sensitive') === 'true');
         core.info(`Allowed Prefixes: ${prefixes}`);
         if (prefixes.length > 0 && !prefixes.split(',').some((el) => validateTitlePrefix(title, el, prefixCaseSensitive))) {
-            core.setFailed(`Pull Request title "${title}" did not match any of the prefixes - ${prefixes}`);
-            return
+            raiseError(`Pull Request title "${title}" did not match any of the prefixes - ${prefixes}`);
         }
 
     } catch (error) {
-        core.setFailed(error.message);
+        raiseError(error.message);
     }
+}
+
+function raiseError(message) {
+    core.setOutput('error_message', message);
+
+    throw new Error(message);
 }
 
 run();
